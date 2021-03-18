@@ -14,6 +14,14 @@
   color: white;
 }
 
+.JokeList-reset {
+  margin: 1em 0;
+  font-size: 150%;
+  border-radius: 0.5em;
+  background-color: blueviolet;
+  color: white;
+}
+
 .JokeList-loader {
   text-align: center;
   margin-top: 20px;
