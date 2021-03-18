@@ -6,6 +6,11 @@ class Joke extends React.Component {
     super(props);
     this.upVote = this.upVote.bind(this);
     this.downVote = this.downVote.bind(this);
+    this.lock = this.lock.bind(this);
+  }
+
+  lock() {
+    this.props.lockJoke(this.props.id);
   }
 
   upVote() {
@@ -31,6 +36,13 @@ class Joke extends React.Component {
         </div>
   
         <div className="Joke-text">{this.props.text}</div>
+
+        {
+          this.props.locked ? <i className="fas fa-lock" /> :
+            <button onClick={this.lock}>
+              <i className="fas fa-lock-open" />
+            </button>
+        }
       </div>
     );
   }

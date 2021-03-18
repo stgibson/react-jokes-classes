@@ -8,6 +8,7 @@ class JokeList extends React.Component {
     super(props);
     this.state = { jokes: [] };
     this.generateNewJokes = this.generateNewJokes.bind(this);
+    this.lockJoke = this.lockJoke.bind(this);
     this.resetVotes = this.resetVotes.bind(this);
     this.vote = this.vote.bind(this);
   }
@@ -17,21 +18,22 @@ class JokeList extends React.Component {
   };
 
   async componentDidUpdate() {
-    if (this.state.jokes.length === 0) await this.getJokes();
+    if (this.state.jokes.length < this.props.numJokesToGet) {
+      await this.getJokes();
+    }
   }
 
   /* empty joke list and then call getJokes */
 
   generateNewJokes() {
     localStorage.clear();
-    this.setState({ jokes: [] });
+    const jokesRemaining = this.state.jokes.filter(joke => joke.locked);
+    this.setState({ jokes: jokesRemaining });
   }
 
   /* get jokes if there are no jokes */
   async getJokes() {
-    console.log("getJokes() called");
     let j = JSON.parse(localStorage.getItem("jokes"));
-    console.dir(j);
     if (j) {
       this.setState({ jokes: j });
     }
@@ -47,7 +49,7 @@ class JokeList extends React.Component {
 
           if (!seenJokes.has(jokeObj.id)) {
             seenJokes.add(jokeObj.id);
-            j.push({ ...jokeObj, votes: 0 });
+            j.push({ ...jokeObj, votes: 0, locked: false });
           } else {
             console.error("duplicate found!");
           }
@@ -59,6 +61,14 @@ class JokeList extends React.Component {
       }
     }
   };
+
+  lockJoke(id) {
+    const j = this.state.jokes.map(j => (
+      j.id === id ? { ...j, locked: true } : j
+    ));
+    localStorage.setItem("jokes", JSON.stringify(j));
+    this.setState({ jokes: j});
+  }
 
   resetVotes() {
     const jokesReset = this.state.jokes.map(joke => ({ ...joke, votes: 0 }));
@@ -93,7 +103,15 @@ class JokeList extends React.Component {
           </button>
     
           {sortedJokes.map(j => (
-            <Joke text={j.joke} key={j.id} id={j.id} votes={j.votes} vote={this.vote} />
+            <Joke
+              text={j.joke}
+              key={j.id}
+              id={j.id}
+              votes={j.votes}
+              vote={this.vote}
+              locked={j.locked}
+              lockJoke={this.lockJoke}
+            />
           ))}
         </div>
       );
