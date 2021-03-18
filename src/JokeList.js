@@ -13,9 +13,13 @@ class JokeList extends React.Component {
     this.vote = this.vote.bind(this);
   }
 
+  /* when component mounts, get jokes */
+
   async componentDidMount() {
     await this.getJokes();
   };
+
+  /* whenever component updates, check if need to get jokes */
 
   async componentDidUpdate() {
     if (this.state.jokes.length < this.props.numJokesToGet) {
@@ -32,6 +36,7 @@ class JokeList extends React.Component {
   }
 
   /* get jokes if there are no jokes */
+
   async getJokes() {
     let j = JSON.parse(localStorage.getItem("jokes"));
     if (j) {
@@ -62,6 +67,10 @@ class JokeList extends React.Component {
     }
   };
 
+  /**
+   * lock a joke so it will remain on the page, even if the user gets new jokes
+   */
+
   lockJoke(id) {
     const j = this.state.jokes.map(j => (
       j.id === id ? { ...j, locked: true } : j
@@ -69,6 +78,8 @@ class JokeList extends React.Component {
     localStorage.setItem("jokes", JSON.stringify(j));
     this.setState({ jokes: j});
   }
+
+  /* resets votes of all jokes to 0 */
 
   resetVotes() {
     const jokesReset = this.state.jokes.map(joke => ({ ...joke, votes: 0 }));
