@@ -8,7 +8,7 @@ class JokeList extends React.Component {
     super(props);
     this.state = { jokes: [] };
     this.generateNewJokes = this.generateNewJokes.bind(this);
-    this.lockJoke = this.lockJoke.bind(this);
+    this.toggleLock = this.toggleLock.bind(this);
     this.resetVotes = this.resetVotes.bind(this);
     this.vote = this.vote.bind(this);
   }
@@ -68,13 +68,18 @@ class JokeList extends React.Component {
   };
 
   /**
-   * lock a joke so it will remain on the page, even if the user gets new jokes
+   * locks or unlocks a joke so it will remain on the page, even if the user
+   * gets new jokes
    */
 
-  lockJoke(id) {
-    const j = this.state.jokes.map(j => (
-      j.id === id ? { ...j, locked: true } : j
-    ));
+  toggleLock(id) {
+    const j = this.state.jokes.map(j => {
+      if (j.id === id) {
+        const currLocked = j.locked;
+        return { ...j, locked: !currLocked };
+      }
+      return j;
+    });
     localStorage.setItem("jokes", JSON.stringify(j));
     this.setState({ jokes: j});
   }
@@ -121,7 +126,7 @@ class JokeList extends React.Component {
               votes={j.votes}
               vote={this.vote}
               locked={j.locked}
-              lockJoke={this.lockJoke}
+              toggleLock={this.toggleLock}
             />
           ))}
         </div>
