@@ -29,7 +29,9 @@ class JokeList extends React.Component {
 
   /* get jokes if there are no jokes */
   async getJokes() {
+    console.log("getJokes() called");
     let j = JSON.parse(localStorage.getItem("jokes"));
+    console.dir(j);
     if (j) {
       this.setState({ jokes: j });
     }
@@ -70,6 +72,7 @@ class JokeList extends React.Component {
     const j = this.state.jokes.map(j => (
       j.id === id ? { ...j, votes: j.votes + delta } : j
     ));
+    localStorage.setItem("jokes", JSON.stringify(j));
     this.setState({ jokes: j });
   }
 
