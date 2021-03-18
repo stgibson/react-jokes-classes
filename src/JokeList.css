@@ -13,3 +13,8 @@
   background-color: tomato;
   color: white;
 }
+
+.JokeList-loader {
+  text-align: center;
+  margin-top: 20px;
+}

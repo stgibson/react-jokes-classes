@@ -13,25 +13,32 @@ class JokeList extends React.Component {
 
   /* get jokes if there are no jokes */
   async getJokes() {
-    let j = [...this.state.jokes];
-    let seenJokes = new Set();
-    try {
-      while (j.length < this.props.numJokesToGet) {
-        let res = await axios.get("https://icanhazdadjoke.com", {
-          headers: { Accept: "application/json" }
-        });
-        let { status, ...jokeObj } = res.data;
-
-        if (!seenJokes.has(jokeObj.id)) {
-          seenJokes.add(jokeObj.id);
-          j.push({ ...jokeObj, votes: 0 });
-        } else {
-          console.error("duplicate found!");
-        }
-      }
+    let j = JSON.parse(localStorage.getItem("jokes"));
+    if (j) {
       this.setState({ jokes: j });
-    } catch (e) {
-      console.log(e);
+    }
+    else {
+      j = [...this.state.jokes];
+      let seenJokes = new Set();
+      try {
+        while (j.length < this.props.numJokesToGet) {
+          let res = await axios.get("https://icanhazdadjoke.com", {
+            headers: { Accept: "application/json" }
+          });
+          let { status, ...jokeObj } = res.data;
+
+          if (!seenJokes.has(jokeObj.id)) {
+            seenJokes.add(jokeObj.id);
+            j.push({ ...jokeObj, votes: 0 });
+          } else {
+            console.error("duplicate found!");
+          }
+        }
+        localStorage.setItem("jokes", JSON.stringify(j));
+        this.setState({ jokes: j });
+      } catch (e) {
+        console.log(e);
+      }
     }
   };
 
@@ -46,6 +53,7 @@ class JokeList extends React.Component {
   /* empty joke list and then call getJokes */
 
   generateNewJokes() {
+    localStorage.clear();
     this.setState({ jokes: [] });
   }
 
@@ -77,10 +85,14 @@ class JokeList extends React.Component {
         </div>
       );
     }
-    return null; 
+    return (
+      <div className="JokeList-loader">
+        <i className="fas fa-spinner fa-5x" />
+      </div>
+    ); 
   }
 
-  static defaultProps = { numJokesToGet: 10 }
+  static defaultProps = { numJokesToGet: 10 } // Learned how to set default props for class component at https://blog.logrocket.com/a-complete-guide-to-default-props-in-react-984ea8e6972d/
 }
 
 export default JokeList;
